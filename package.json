@@ -1,0 +1,81 @@
+{
+  "name": "md-popups",
+  "displayName": "MD Popups",
+  "description": "Lista os arquivos Markdown do seu código e abre o conteúdo em uma janela pop-up.",
+  "version": "0.0.2",
+  "publisher": "LuccasMatheus",
+  "author": "LuccasMatheus",
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Markdown",
+    "MD",
+    "Markdown Reader",
+    "MD Reader"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.md",
+    "onCommand:mdPopups.abrir",
+    "onCommand:mdPopups.abrirArquivo",
+    "onCommand:mdPopups.abrirEditor"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mdPopups.abrir",
+        "title": "MD Popups: Lista de arquivos Markdown",
+        "category": "Markdown"
+      },
+      {
+        "command": "mdPopups.abrirArquivo",
+        "title": "MD Popups: Abrir este Markdown na janela pop-up",
+        "category": "Markdown"
+      },
+      {
+        "command": "mdPopups.abrirEditor",
+        "title": "MD Popups: Abrir Markdown no editor",
+        "category": "Markdown"
+      }
+    ],
+    "configuration": {
+      "title": "MD Popups",
+      "properties": {
+        "mdPopups.autoAbrir": {
+          "type": "boolean",
+          "default": true,
+          "description": "Abre a lista de arquivos Markdown automaticamente ao abrir a pasta do projeto."
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "mdPopups.abrir",
+        "key": "ctrl+alt+m",
+        "mac": "cmd+alt+m"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "mdPopups.abrirArquivo",
+          "when": "editorLangId == markdown"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "mdPopups.abrirArquivo",
+          "when": "resourceExtname == .md",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "logo": "node scripts/gerar-logo.js --preview",
+    "lint": "node -e \"require('fs').readdirSync('src').forEach(f=>require('vm').compileFunction(require('fs').readFileSync('src/'+f,'utf8')))\" && echo OK"
+  }
+}
