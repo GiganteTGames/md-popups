@@ -2,19 +2,26 @@
   "name": "md-popups",
   "displayName": "MD Popups",
   "description": "Lista os arquivos Markdown do seu código e abre o conteúdo em uma janela pop-up.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "LuccasMatheus",
   "author": "LuccasMatheus",
   "license": "MIT",
   "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/luccasmcarvalho/couterlive.git"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
+    "Extension Packs",
+    "Other",
+    "Visualization"
+  ],
+  "tags": [
     "Markdown",
-    "MD",
-    "Markdown Reader",
-    "MD Reader"
+    "Markdown Reader"
   ],
   "activationEvents": [
     "workspaceContains:**/*.md",
