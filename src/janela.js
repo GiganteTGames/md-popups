@@ -57,6 +57,26 @@ function relativo(uri) {
   return vscode.workspace.asRelativePath(uri, false);
 }
 
+function incluirPastasOcultas() {
+  return (
+    vscode.workspace
+      .getConfiguration("mdPopups")
+      .get("incluirPastasOcultas", false) === true
+  );
+}
+
+function dentroDePastaOculta(uri) {
+  const pasta = vscode.workspace.getWorkspaceFolder(uri);
+  const base =
+    pasta && pasta.uri ? pasta.uri.fsPath : path.parse(uri.fsPath).root;
+  const partes = path
+    .relative(base, uri.fsPath)
+    .replace(/\\/g, "/")
+    .split("/");
+  partes.pop();
+  return partes.some((parte) => parte.startsWith("."));
+}
+
 function uriVscode(abs) {
   const norm = String(abs).replace(/\\/g, "/");
   return (
@@ -126,10 +146,12 @@ async function listarArquivos() {
     "**/*.md",
     "**/{node_modules,.git,dist,build,out}/**"
   );
+  const mostrarOcultos = incluirPastasOcultas();
   const vistos = new Set();
   const itens = [];
   for (const uri of bruto) {
     if (!/\.md$/i.test(uri.fsPath)) continue;
+    if (!mostrarOcultos && dentroDePastaOculta(uri)) continue;
     if (vistos.has(uri.fsPath)) continue;
     vistos.add(uri.fsPath);
     itens.push({
@@ -197,6 +219,9 @@ async function tratar(req, res) {
       setTimeout(() => encerrarJanela(chave), 80);
       return;
     }
+    if (req.method === "POST" && url.pathname === "/preferencia") {
+      return salvarPreferencia(url, res);
+    }
     res.writeHead(404);
     res.end();
   } catch (e) {
@@ -216,6 +241,22 @@ async function enviarDocumento(url, res) {
     "Cache-Control": "no-store",
   });
   res.end(html);
+}
+
+async function salvarPreferencia(url, res) {
+  const chave = url.searchParams.get("chave");
+  const permitidas = ["incluirPastasOcultas"];
+  if (!permitidas.includes(chave)) {
+    res.writeHead(400);
+    res.end("Preferência inválida");
+    return;
+  }
+  const valor = url.searchParams.get("v") === "1";
+  await vscode.workspace
+    .getConfiguration("mdPopups")
+    .update(chave, valor, vscode.ConfigurationTarget.Global);
+  res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+  res.end("ok");
 }
 
 async function enviarPagina(url, res) {
@@ -325,8 +366,8 @@ function estilos(c) {
   header a:hover, header button:hover { text-decoration: underline; }
   header .voltar { font-size: 16px; line-height: 1; }
   header .fechar { font-size: 15px; line-height: 1; }
-  .barra { padding: 0 14px 10px; }
-  .barra input {
+  .barra { padding: 0 14px 10px; display: flex; flex-direction: column; gap: 8px; }
+  .barra #filtro {
     width: 100%;
     padding: 7px 10px;
     font: inherit;
@@ -336,7 +377,23 @@ function estilos(c) {
     border-radius: 5px;
     outline: none;
   }
-  .barra input:focus { border-color: ${c.link}; }
+  .barra #filtro:focus { border-color: ${c.link}; }
+  .barra .opcoes {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.88em;
+    opacity: 0.85;
+    cursor: pointer;
+    user-select: none;
+  }
+  .barra .opcoes input {
+    margin: 0;
+    width: auto;
+    padding: 0;
+    accent-color: ${c.link};
+    cursor: pointer;
+  }
   ul#lista { list-style: none; margin: 0; padding: 4px 6px 60px; }
   ul#lista li a {
     display: flex;
@@ -456,6 +513,10 @@ async function montarLista(k) {
   <div class="barra">
     <input id="filtro" type="search" autofocus autocomplete="off" spellcheck="false"
       placeholder="Filtrar por nome ou caminho  ·  Enter abre  ·  Esc fecha">
+    <label class="opcoes" title="Incluir arquivos .md que estão dentro de pastas ocultas">
+      <input type="checkbox" id="incluirOcultas"${incluirPastasOcultas() ? " checked" : ""}>
+      Incluir pastas ocultas
+    </label>
   </div>
 </div>
 <ul id="lista">${linhas}</ul>
@@ -504,6 +565,18 @@ async function montarLista(k) {
         visiveis[prox].querySelector("a").focus();
       }
     }
+  });
+
+  var ocultas = document.getElementById("incluirOcultas");
+  ocultas.addEventListener("change", function () {
+    ocultas.disabled = true;
+    fetch(
+      "/preferencia?t=" + t +
+        "&chave=incluirPastasOcultas&v=" + (ocultas.checked ? "1" : "0"),
+      { method: "POST" }
+    )
+      .catch(function () {})
+      .then(function () { location.reload(); });
   });
 
   document.addEventListener("keydown", function (e) {

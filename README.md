@@ -17,6 +17,7 @@ No Explorer, o item aparece no menu de contexto de arquivos `.md`.
 ## Comportamento
 
 - **Abertura automática:** ao abrir a pasta do projeto (que contenha `.md`), a janela com a lista abre sozinha. Desative em `Settings → MD Popups: Auto Abrir` (`mdPopups.autoAbrir`).
+- **Pastas ocultas:** por padrão, arquivos `.md` dentro de pastas ocultas (ex.: `.github`, `.vscode`) não aparecem na lista. Marque **Incluir pastas ocultas** na janela (ou ative `mdPopups.incluirPastasOcultas` nas configurações) para listá-los e exibi-los.
 - **Lista com filtro:** a janela mostra somente arquivos `.md`; digite para filtrar por nome ou caminho, `Enter` abre o primeiro resultado, `Esc` fecha a janela.
 - **Documento:** `←` volta para a lista, **Atualizar** recarrega, **Abrir no editor** leva ao editor (`vscode://file/...`). O conteúdo se atualiza sozinho ao salvar o arquivo.
 

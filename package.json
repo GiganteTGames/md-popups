@@ -2,7 +2,7 @@
   "name": "md-popups",
   "displayName": "MD Popups",
   "description": "Lista os arquivos Markdown do seu código e abre o conteúdo em uma janela pop-up.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "LuccasMatheus",
   "author": "LuccasMatheus",
   "license": "MIT",
@@ -55,6 +55,11 @@
           "type": "boolean",
           "default": true,
           "description": "Abre a lista de arquivos Markdown automaticamente ao abrir a pasta do projeto."
+        },
+        "mdPopups.incluirPastasOcultas": {
+          "type": "boolean",
+          "default": false,
+          "description": "Lista e exibe também os arquivos Markdown que estão dentro de pastas ocultas (ex.: .github, .vscode)."
         }
       }
     },
